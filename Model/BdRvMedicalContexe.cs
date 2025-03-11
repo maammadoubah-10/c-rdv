@@ -29,6 +29,8 @@ namespace AppGroupe2.Model
         public DbSet<Secretaire> Secretaires { get; set; }
         public DbSet<Specialite> Specialites {  get; set; }
         public DbSet<GroupeSanguin> GroupeSanguins {  get; set; }
+       // public DbSet<Td_Erreur> Td_Erreurs {  get; set; }
+
 
 
     }

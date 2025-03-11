@@ -34,37 +34,96 @@ namespace AppGroupe2.View
 
         private void frmRendezVous_Load(object sender, EventArgs e)
         {
-            // Charger les patients dans le ComboBox
+            // Charger les patients, médecins et soins (comme avant)
             cbPatient.DataSource = db.Patients.ToList();
-            cbPatient.DisplayMember = "NomPrenom"; // Afficher le nom du patient
-            cbPatient.ValueMember = "IDU"; // Utiliser l'ID du patient comme valeur
+            cbPatient.DisplayMember = "NomPrenom";
+            cbPatient.ValueMember = "IDU";
 
-            // Charger les médecins dans le ComboBox
             cbMedecin.DataSource = db.Medecins.ToList();
-            cbMedecin.DisplayMember = "NomPrenom"; // Afficher le nom du médecin
-            cbMedecin.ValueMember = "IDU"; // Utiliser l'ID du médecin comme valeur
+            cbMedecin.DisplayMember = "NomPrenom";
+            cbMedecin.ValueMember = "IDU";
 
-            // Charger les soins dans le ComboBox
             cbSoin.DataSource = db.Soins.ToList();
-            cbSoin.DisplayMember = "libelle"; // Afficher le nom du soin
-            cbSoin.ValueMember = "IdSoin"; // Utiliser l'ID du soin comme valeur
+            cbSoin.DisplayMember = "libelle";
+            cbSoin.ValueMember = "IdSoin";
 
             // Charger la liste des rendez-vous dans le DataGridView
             var rendezVousList = db.RendezVous
-              .Select(rv => new
-                  {
-                     rv.IdRv,
-                     rv.DateRv,
-                     rv.Statut,
-                     Patient = rv.patient.NomPrenom,  // Remplace l'ID du patient par son nom
-                     Medecin = rv.Medecin.NomPrenom,  // Remplace l'ID du médecin par son nom
-                     Soin = rv.Soin.libelle         // Remplace l'ID du soin par son libellé
-                 })
-                     .ToList();
+                .Select(rv => new
+                {
+                    rv.IdRv,
+                    rv.DateRv,
+                    rv.Statut,
+                    Patient = rv.patient.NomPrenom,
+                    Medecin = rv.Medecin.NomPrenom,
+                    Soin = rv.Soin.libelle
+                })
+                .ToList();
+            dgRendezVous.DataSource = rendezVousList;
 
-                      dgRendezVous.DataSource = rendezVousList;
-
+            // Si un médecin est sélectionné, charger ses créneaux disponibles
+            if (cbMedecin.SelectedValue != null)
+            {
+                int idMedecin = (int)cbMedecin.SelectedValue;
+                LoadAvailableCreneaux(idMedecin);
+            }
         }
+
+        // Méthode pour charger les créneaux disponibles pour le médecin
+        private void LoadAvailableCreneaux(int idMedecin)
+        {
+            // Effacer les anciennes valeurs
+            cbCreneaux.Items.Clear();
+
+            // Charger les agendas pour ce médecin
+            var agendas = db.Agenda.Where(a => a.IdMedecin == idMedecin && a.DatePlanifier >= DateTime.Now).ToList();
+
+            foreach (var agenda in agendas)
+            {
+                DateTime start, end;
+
+                // Essayer de convertir HeureDebut et HeureFin en TimeSpan
+                bool startParsed = TimeSpan.TryParse(agenda.HeureDebut, out TimeSpan startTime);
+                bool endParsed = TimeSpan.TryParse(agenda.HeureFin, out TimeSpan endTime);
+
+                if (startParsed && endParsed)
+                {
+                    // Calculer l'heure de début et de fin à partir de la date de l'agenda et des heures spécifiées
+                    start = agenda.DatePlanifier.Value.Add(startTime);
+                    end = agenda.DatePlanifier.Value.Add(endTime);
+
+                    // Parcourir les créneaux dans l'intervalle de l'agenda
+                    while (start < end)
+                    {
+                        // Vérifier si ce créneau est déjà pris (par exemple, s'il existe déjà un rendez-vous à cette heure)
+                        bool isTaken = db.RendezVous.Any(rv => rv.DateRv == start && rv.IdMedecin == idMedecin);
+
+                        if (!isTaken)
+                        {
+                            // Ajouter ce créneau comme disponible
+                            cbCreneaux.Items.Add(start.ToString("HH:mm"));
+                        }
+
+                        // Ajouter 30 minutes au créneau pour vérifier le suivant
+                        start = start.AddMinutes(30);
+                    }
+                }
+                else
+                {
+                    // Gérer l'erreur de format des horaires si nécessaire
+                    Console.WriteLine($"Erreur de format dans les horaires pour l'agenda ID {agenda.IdAgenda}: {agenda.HeureDebut} ou {agenda.HeureFin}");
+                }
+            }
+
+            // Sélectionner le premier créneau disponible par défaut
+            if (cbCreneaux.Items.Count > 0)
+            {
+                cbCreneaux.SelectedIndex = 0;
+            }
+        }
+
+
+
 
 
         private void btnAjouter_Click(object sender, EventArgs e)
@@ -108,6 +167,11 @@ namespace AppGroupe2.View
             {
                 MessageBox.Show("Veuillez sélectionner un rendez-vous pour imprimer le ticket.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

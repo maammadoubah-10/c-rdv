@@ -38,23 +38,38 @@ namespace AppGroupe2.View
 
         private void btnAjouter_Click(object sender, EventArgs e)
         {
+            string heureDebut = txtHeureDebut.Text;
+            string heureFin = txtHeureFin.Text;
+            DateTime datePlanifier = txtDateAgenda.Value;
 
-            //string timeString = cbCreneau.ToString();
-            //timeString = timeString.Replace("h", ":").Trim(); // Remplace "h" par ":" pour correspondre au format TimeSpan
-            //TimeSpan heureDebut = TimeSpan.Parse(timeString);
-            Agenda a = new Agenda();
+            // Vérifier si le médecin a déjà un créneau à cette heure
+            bool chevauchement = db.Agenda
+     .Any(agenda => agenda.IdMedecin == idMedecin && agenda.DatePlanifier == datePlanifier &&
+                    ((heureDebut.CompareTo(agenda.HeureDebut) >= 0 && heureDebut.CompareTo(agenda.HeureFin) < 0) ||
+                     (heureFin.CompareTo(agenda.HeureDebut) > 0 && heureFin.CompareTo(agenda.HeureFin) <= 0)));
 
-            a.Creaneau = cbCreneau.Text;
-            a.HeureDebut = txtHeureDebut.Text;
-            a.HeureFin = txtHeureFin.Text;
-            a.IdMedecin = idMedecin;
-            a.DatePlanifier = txtDateAgenda.Value;
-            a.Statut = "brouillon";
-            a.lieu = txtLieu.Text;
-            
+            if (chevauchement)
+            {
+                MessageBox.Show("Ce créneau chevauche un autre déjà défini pour ce médecin.",
+                                "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Agenda a = new Agenda
+            {
+                Creaneau = cbCreneau.Text,
+                HeureDebut = heureDebut,
+                HeureFin = heureFin,
+                IdMedecin = idMedecin,
+                DatePlanifier = datePlanifier,
+                Statut = "brouillon",
+                lieu = txtLieu.Text
+            };
 
             db.Agenda.Add(a);
             db.SaveChanges();
+
+            MessageBox.Show("Agenda ajouté avec succès.", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ResetForm();
         }
 

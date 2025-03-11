@@ -44,10 +44,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.dtpDateRv = new System.Windows.Forms.DateTimePicker();
             this.label3 = new System.Windows.Forms.Label();
-            this.dgCreneaux = new System.Windows.Forms.DataGridView();
+            this.cbCreneaux = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.btnImprimer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgRendezVous)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgCreneaux)).BeginInit();
             this.SuspendLayout();
             // 
             // label6
@@ -196,13 +196,23 @@
             this.label3.TabIndex = 31;
             this.label3.Text = "Parametrage des rendez-vous";
             // 
-            // dgCreneaux
+            // cbCreneaux
             // 
-            this.dgCreneaux.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgCreneaux.Location = new System.Drawing.Point(25, 160);
-            this.dgCreneaux.Name = "dgCreneaux";
-            this.dgCreneaux.Size = new System.Drawing.Size(101, 208);
-            this.dgCreneaux.TabIndex = 47;
+            this.cbCreneaux.FormattingEnabled = true;
+            this.cbCreneaux.Location = new System.Drawing.Point(10, 400);
+            this.cbCreneaux.Name = "cbCreneaux";
+            this.cbCreneaux.Size = new System.Drawing.Size(140, 21);
+            this.cbCreneaux.TabIndex = 49;
+            this.cbCreneaux.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(12, 384);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(47, 13);
+            this.label7.TabIndex = 50;
+            this.label7.Text = "Creneau";
             // 
             // btnImprimer
             // 
@@ -222,8 +232,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(927, 515);
             this.ControlBox = false;
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.cbCreneaux);
             this.Controls.Add(this.btnImprimer);
-            this.Controls.Add(this.dgCreneaux);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.txtStatut);
             this.Controls.Add(this.btnSupprimer);
@@ -244,7 +255,6 @@
             this.Text = "RendezVous";
             this.Load += new System.EventHandler(this.frmRendezVous_Load_1);
             ((System.ComponentModel.ISupportInitialize)(this.dgRendezVous)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgCreneaux)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -268,7 +278,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DateTimePicker dtpDateRv;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DataGridView dgCreneaux;
+        private System.Windows.Forms.ComboBox cbCreneaux;
+        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button btnImprimer;
     }
 }
